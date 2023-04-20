@@ -3,9 +3,13 @@ import { useState } from "react"
 export function MintButton({
   handleClick,
   disabled = false,
+  image,
+  imageHover
 }: {
   handleClick?: React.MouseEventHandler<HTMLButtonElement>
-  disabled?: boolean
+  disabled?: boolean,
+  image: string
+  imageHover: string
 }) {
   const [hover, setHover] = useState(false)
 
@@ -14,8 +18,8 @@ export function MintButton({
       <img
         src={
           hover
-            ? "https://pixelady.s3.amazonaws.com/aura-petz/mint_button_unselected_small.webp"
-            : "https://pixelady.s3.amazonaws.com/aura-petz/mint_button_selected_small.webp"
+            ? imageHover
+            : image
         }
         width="284"
         height="140"

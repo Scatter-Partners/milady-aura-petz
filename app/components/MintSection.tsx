@@ -2,12 +2,16 @@ import type { Web3Provider } from "@ethersproject/providers";
 import type { Contract } from "ethers";
 import { ethers } from "ethers";
 import { MintButton } from "./MintButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 export const ETHERSCAN_DOMAIN = "https://etherscan.io";
+// export const API_URL = "https://scatter-api.fly.dev"
+export const API_URL = "https://scatter-api-testing.fly.dev";
 
 const address = "0xc8FAFEe7E6f3B3359A5FA850605C74520e19a5B6"; // pixelady test goerli
+const root =
+  "0x66e915aa20ae05002bc22942644e1520cf77a628aefadff9248f0b42c4d80bd0";
 
 const abi = require("../lib/abi/ArchetypeV51.json");
 
@@ -51,6 +55,10 @@ export type IMintModalDataV40 = {
 
 export function MintSection({ provider }: { provider?: Web3Provider }) {
   const [quantity, setQuantity] = useState<number>(1);
+  const [proof, setProof] = useState<{
+    status: "fetching" | "idle";
+    theProof: string[];
+  }>({ status: "idle", theProof: [] });
 
   const [modalData, setModalData] = useState<IMintModalDataV40>({
     txnHash: "",
@@ -60,7 +68,38 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
     currencyAddress: ethers.constants.AddressZero,
   });
 
-  // mint from public invite list
+  useEffect(() => {
+    (async function fetchProof() {
+      if (!provider) {
+        return;
+      }
+
+      setProof({ status: "fetching", theProof: [] });
+
+      console.log({ address });
+      const account = await provider.getSigner().getAddress();
+
+      const listsRes = await fetch(
+        `${API_URL}/api/collections/${address}/eligiblelists/${account}`
+      );
+      const lists = await listsRes.json();
+      console.log({ lists });
+
+      if (lists.length <= 1) {
+        setProof({ status: "idle", theProof: [] });
+        return;
+      }
+
+      const proofRes = await fetch(
+        `${API_URL}/api/collections/${address}/root/${root}/account/${account}`
+      );
+      const _proof = await proofRes.json();
+
+      console.log({ proof: _proof.body.proof });
+      setProof({ status: "idle", theProof: _proof.body.proof });
+    })();
+  }, []);
+
   async function mintPublic() {
     if (!provider) {
       throw new Error("no provider!");
@@ -103,6 +142,81 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
         affiliateSigner,
         { value: price, gasLimit: estimatedGas }
       );
+      console.log(`Transaction hash: ${tx.hash}`);
+
+      setModalData((prev) => ({
+        ...prev,
+        txnHash: tx.hash,
+      }));
+
+      const receipt = await tx?.wait();
+
+      const transferEvents = (receipt as any).events.filter(
+        (evt: any) => evt.event === "Transfer"
+      );
+
+      const tokenIds = transferEvents.map((evt: any) =>
+        evt.args.tokenId.toString()
+      );
+
+      setModalData((prev) => ({
+        ...prev,
+        tokenIds,
+        txnHash: receipt.transactionHash,
+      }));
+
+      console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+      console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+      // callback(true)
+    } catch (error) {
+      console.log("rejected mint");
+      console.log(error);
+      // callback(false)
+    }
+  }
+
+  async function mintPrivate() {
+    if (!provider) {
+      throw new Error("no provider!");
+    }
+
+    const nftContract = new ethers.Contract(address, abi, provider.getSigner());
+
+    if (quantity > (await getMaxQuantity(nftContract))) {
+      console.log("Max quantity exceeded");
+      return;
+    }
+
+    const privateListRoot =
+      "0x66e915aa20ae05002bc22942644e1520cf77a628aefadff9248f0b42c4d80bd0";
+
+    let invite = await nftContract.invites(privateListRoot);
+
+    let price = (invite["price"] * quantity).toString();
+    let auth = [privateListRoot, proof];
+    let affiliate = ethers.constants.AddressZero;
+    let affiliateSigner = ethers.constants.HashZero;
+
+    let estimatedGas = 0;
+    try {
+      const estimatedGasFromContract = await nftContract.estimateGas.mint(
+        auth,
+        1,
+        affiliate,
+        affiliateSigner,
+        { value: price, gasLimit: 0 }
+      );
+      estimatedGas = estimatedGasFromContract.toNumber();
+    } catch (error) {
+      console.log("User has insufficient funds for mint");
+      console.log(error);
+    }
+
+    try {
+      const tx = await nftContract.mint(auth, 1, affiliate, affiliateSigner, {
+        value: price,
+        gasLimit: estimatedGas,
+      });
       console.log(`Transaction hash: ${tx.hash}`);
 
       setModalData((prev) => ({
@@ -213,7 +327,14 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
     </div>
   );
 
-  const mintUi = (
+  const MintUi = ({
+    merkleProof,
+  }: {
+    merkleProof: {
+      status: "fetching" | "idle";
+      theProof: string[];
+    };
+  }) => (
     <div className="flex flex-col text-white items-center">
       <div className="flex flex-row justify-between items-center space-x-10">
         <div className="text-5xl font-normal">
@@ -255,13 +376,36 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
       <div className="text-lg mt-4 font-semibold">.025ETH</div>
 
       <div className="w-48 mt-8">
-        <MintButton handleClick={mintPublic} />
+        <MintButton
+          image="https://pixelady.s3.amazonaws.com/aura-petz/mint_button_selected_small.webp"
+          imageHover="https://pixelady.s3.amazonaws.com/aura-petz/mint_button_unselected_small.webp"
+          handleClick={mintPublic}
+        />
+      </div>
+
+      <div className="w-48 mt-8 border-t border-gray-200 pt-12 text-center">
+        {merkleProof.status === "fetching"
+          ? "Checking free mint eligibility..."
+          : null}
+
+        {merkleProof.theProof.length ? (
+          <MintButton
+            image="https://pixelady.s3.amazonaws.com/aura-petz/free_mint_button.webp"
+            imageHover="https://pixelady.s3.amazonaws.com/aura-petz/free_mint_button_hover.webp"
+            handleClick={mintPrivate}
+          />
+        ) : merkleProof.status === "idle" ? (
+          "No free mint"
+        ) : null}
       </div>
     </div>
   );
-  return modalData.tokenIds.length
-    ? congratsUi
-    : modalData.txnHash
-    ? pendingUi
-    : mintUi;
+
+  return modalData.tokenIds.length ? (
+    congratsUi
+  ) : modalData.txnHash ? (
+    pendingUi
+  ) : (
+    <MintUi merkleProof={proof} />
+  );
 }
