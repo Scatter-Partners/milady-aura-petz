@@ -1,56 +1,56 @@
-import type { Web3Provider } from "@ethersproject/providers"
-import type { Contract } from "ethers"
-import { ethers } from "ethers"
-import { MintButton } from "./MintButton"
-import { useState } from "react"
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline"
+import type { Web3Provider } from "@ethersproject/providers";
+import type { Contract } from "ethers";
+import { ethers } from "ethers";
+import { MintButton } from "./MintButton";
+import { useState } from "react";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
-export const ETHERSCAN_DOMAIN = "https://etherscan.io"
+export const ETHERSCAN_DOMAIN = "https://etherscan.io";
 
-const address = "0xc8FAFEe7E6f3B3359A5FA850605C74520e19a5B6" // pixelady test goerli
+const address = "0xc8FAFEe7E6f3B3359A5FA850605C74520e19a5B6"; // pixelady test goerli
 
-const abi = require("../lib/abi/ArchetypeV51.json")
+const abi = require("../lib/abi/ArchetypeV51.json");
 
 async function getMaxQuantity(nftContract: Contract) {
-  let maxQuantity = 0
+  let maxQuantity = 0;
 
   // check invite limit
-  let invite = await nftContract.invites(ethers.constants.HashZero)
-  console.log({ invite })
+  let invite = await nftContract.invites(ethers.constants.HashZero);
+  console.log({ invite });
 
-  let limit = invite["limit"]
+  let limit = invite["limit"];
 
-  console.log({ limit })
+  console.log({ limit });
 
   let currentBalance = await nftContract.balanceOf(
     nftContract.signer.getAddress()
-  )
-  maxQuantity = Number(limit) - currentBalance
+  );
+  maxQuantity = Number(limit) - currentBalance;
 
   // check max batch size
-  let config = await nftContract.config()
-  let maxBatch = config["maxBatchSize"]
-  maxQuantity = maxQuantity < maxBatch ? maxQuantity : maxBatch
+  let config = await nftContract.config();
+  let maxBatch = config["maxBatchSize"];
+  maxQuantity = maxQuantity < maxBatch ? maxQuantity : maxBatch;
 
   // check contract max supply
-  let maxSupply = config["maxSupply"]
-  let curSupply = await nftContract.totalSupply()
-  let diff = maxSupply - curSupply
+  let maxSupply = config["maxSupply"];
+  let curSupply = await nftContract.totalSupply();
+  let diff = maxSupply - curSupply;
 
-  maxQuantity = maxQuantity < diff ? maxQuantity : diff
-  return maxQuantity
+  maxQuantity = maxQuantity < diff ? maxQuantity : diff;
+  return maxQuantity;
 }
 
 export type IMintModalDataV40 = {
-  txnHash: string
-  tokenIds: number[]
-  quantity: number
-  price: string
-  currencyAddress?: string
-}
+  txnHash: string;
+  tokenIds: number[];
+  quantity: number;
+  price: string;
+  currencyAddress?: string;
+};
 
 export function MintSection({ provider }: { provider?: Web3Provider }) {
-  const [quantity, setQuantity] = useState<number>(1)
+  const [quantity, setQuantity] = useState<number>(1);
 
   const [modalData, setModalData] = useState<IMintModalDataV40>({
     txnHash: "",
@@ -58,29 +58,29 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
     quantity: 0,
     price: "0",
     currencyAddress: ethers.constants.AddressZero,
-  })
+  });
 
   // mint from public invite list
   async function mintPublic() {
     if (!provider) {
-      throw new Error("no provider!")
+      throw new Error("no provider!");
     }
 
-    const nftContract = new ethers.Contract(address, abi, provider.getSigner())
+    const nftContract = new ethers.Contract(address, abi, provider.getSigner());
 
     if (quantity > (await getMaxQuantity(nftContract))) {
-      console.log("Max quantity exceeded")
-      return
+      console.log("Max quantity exceeded");
+      return;
     }
 
-    let invite = await nftContract.invites(ethers.constants.HashZero)
+    let invite = await nftContract.invites(ethers.constants.HashZero);
 
-    let price = (invite["price"] * quantity).toString()
-    let auth = [ethers.constants.HashZero, []]
-    let affiliate = ethers.constants.AddressZero
-    let affiliateSigner = ethers.constants.HashZero
+    let price = (invite["price"] * quantity).toString();
+    let auth = [ethers.constants.HashZero, []];
+    let affiliate = ethers.constants.AddressZero;
+    let affiliateSigner = ethers.constants.HashZero;
 
-    let estimatedGas = 0
+    let estimatedGas = 0;
     try {
       const estimatedGasFromContract = await nftContract.estimateGas.mint(
         auth,
@@ -88,11 +88,11 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
         affiliate,
         affiliateSigner,
         { value: price, gasLimit: 0 }
-      )
-      estimatedGas = estimatedGasFromContract.toNumber()
+      );
+      estimatedGas = estimatedGasFromContract.toNumber();
     } catch (error) {
-      console.log("User has insufficient funds for mint")
-      console.log(error)
+      console.log("User has insufficient funds for mint");
+      console.log(error);
     }
 
     try {
@@ -102,47 +102,71 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
         affiliate,
         affiliateSigner,
         { value: price, gasLimit: estimatedGas }
-      )
-      console.log(`Transaction hash: ${tx.hash}`)
+      );
+      console.log(`Transaction hash: ${tx.hash}`);
 
       setModalData((prev) => ({
         ...prev,
         txnHash: tx.hash,
-      }))
+      }));
 
-      const receipt = await tx?.wait()
+      const receipt = await tx?.wait();
 
       const transferEvents = (receipt as any).events.filter(
         (evt: any) => evt.event === "Transfer"
-      )
+      );
 
       const tokenIds = transferEvents.map((evt: any) =>
         evt.args.tokenId.toString()
-      )
+      );
 
       setModalData((prev) => ({
         ...prev,
         tokenIds,
         txnHash: receipt.transactionHash,
-      }))
+      }));
 
-      console.log(`Transaction confirmed in block ${receipt.blockNumber}`)
-      console.log(`Gas used: ${receipt.gasUsed.toString()}`)
+      console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+      console.log(`Gas used: ${receipt.gasUsed.toString()}`);
       // callback(true)
     } catch (error) {
-      console.log("rejected mint")
-      console.log(error)
+      console.log("rejected mint");
+      console.log(error);
       // callback(false)
     }
   }
 
   const congratsUi = (
-    <div className="flex flex-col text-white items-center">
-      Congrats!
+    <div className="flex flex-col text-white items-center relative">
+      <div className="absolute -top-80 -left-80">
+        <img
+          src="https://pixelady.s3.amazonaws.com/aura-petz/exclamation_l.webp"
+          width="316"
+          height="485"
+          alt="!"
+        />
+      </div>
+      <div className="absolute -top-80 -right-80">
+        <img
+          src="https://pixelady.s3.amazonaws.com/aura-petz/exclamation_r.webp"
+          width="333"
+          height="481"
+          alt="!"
+        />
+      </div>
+      <div>
+        <img
+          src="https://pixelady.s3.amazonaws.com/aura-petz/congratz.webp"
+          width="575"
+          height="112"
+          alt="congratz on yr new pet"
+        />
+      </div>
+
       <div className="mt-8 mb-4 text-center">
         <p className="text-sm text-gray-500">
-          Token
-          {(modalData.tokenIds?.length || 1) > 1 ? "s" : ""} minted:
+          Pet
+          {(modalData.tokenIds?.length || 1) > 1 ? "z" : ""} minted:
         </p>
         <div className="mt-3 space-y-2">
           {modalData.tokenIds?.map((id) => (
@@ -160,26 +184,34 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
         </div>
       </div>
     </div>
-  )
+  );
 
   const pendingUi = (
     <div className="flex flex-col text-white items-center">
-      <div className="flex items-center mx-auto text-center justify-center text-sm text-sky-300 group mt-2 mb-3">
-        <a
-          href={`${ETHERSCAN_DOMAIN}/tx/${modalData.txnHash}`}
-          target="_blank"
-          rel="noreferrer"
-          className="underline group-hover:no-underline"
-        >
-          View Transaction
-        </a>{" "}
-        <ArrowTopRightOnSquareIcon
-          className="ml-1 h-4 w-4 text-slate-500 group-hover:text-slate-600 group-hover:translate-x-1 transition-all"
-          aria-hidden="true"
+      <div className="flex items-center mx-auto text-center justify-center text-sm text-sky-300 group mt-2 mb-3 flex-col">
+        <img
+          src="https://pixelady.s3.amazonaws.com/aura-petz/loading.webp"
+          width="334"
+          height="77"
+          alt="loading..."
         />
+        <div className="flex flex-row items-center justify-center mt-4">
+          <a
+            href={`${ETHERSCAN_DOMAIN}/tx/${modalData.txnHash}`}
+            target="_blank"
+            rel="noreferrer"
+            className="underline group-hover:no-underline text-base mr-1"
+          >
+            View Transaction
+          </a>{" "}
+          <ArrowTopRightOnSquareIcon
+            className="ml-1 h-4 w-4 text-slate-500 group-hover:text-slate-600 group-hover:translate-x-1 transition-all"
+            aria-hidden="true"
+          />
+        </div>
       </div>
     </div>
-  )
+  );
 
   const mintUi = (
     <div className="flex flex-col text-white items-center">
@@ -189,7 +221,7 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
             className=""
             onClick={() =>
               setQuantity((prev) => {
-                return prev > 1 ? prev - 1 : 1
+                return prev > 1 ? prev - 1 : 1;
               })
             }
           >
@@ -210,7 +242,7 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
             max={1888}
             value={!Number.isNaN(quantity) ? quantity : 1}
             onChange={(e) => {
-              setQuantity(Number(e.target.value))
+              setQuantity(Number(e.target.value));
             }}
           />
         </div>
@@ -220,16 +252,16 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
           </button>
         </div>
       </div>
-      <div className="text-lg mt-4 font-semibold">.25ETH</div>
+      <div className="text-lg mt-4 font-semibold">.025ETH</div>
 
       <div className="w-48 mt-8">
         <MintButton handleClick={mintPublic} />
       </div>
     </div>
-  )
+  );
   return modalData.tokenIds.length
     ? congratsUi
     : modalData.txnHash
     ? pendingUi
-    : mintUi
+    : mintUi;
 }
