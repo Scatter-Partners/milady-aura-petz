@@ -45,7 +45,7 @@ export function Accounts({
 
   return (
     <div>
-      Accounts:{" "}
+      {/* Accounts:{" "} */}
       <b>
         {!accounts.length
           ? "None"
@@ -58,11 +58,26 @@ export function Accounts({
                   textOverflow: "ellipsis",
                 }}
               >
-                {ENSNames?.[i] ?? account}
-                {balances?.[i] ? ` (Ξ${formatEther(balances[i])})` : null}
+                <li className="text-2xl mt-2">
+                  {ENSNames?.[i] ?? shortenAddress(account)}
+                </li>
+                <li className="text-lg mt-1">
+                  {balances?.[i]
+                    ? ` (Ξ${Number(formatEther(balances[i])).toFixed(3)})`
+                    : null}
+                </li>
               </ul>
             ))}
       </b>
     </div>
+  );
+}
+
+export function shortenAddress(address?: string) {
+  if (!address || !address.length) {
+    return "";
+  }
+  return (
+    address.substring(0, 6) + "..." + address.substring(address.length - 4)
   );
 }

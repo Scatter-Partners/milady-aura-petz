@@ -6,8 +6,18 @@ import { ConnectWithSelect } from "~/components/ConnectWithSelect";
 import { hooks, metaMask } from "~/lib/connectors/metaMask";
 import EventEmitter from "~/lib/utils/eventemitter.server";
 import { MintSection } from "~/components/MintSection";
+import { Card } from "~/components/Card";
+import { Status } from "~/components/Status";
+import { Accounts } from "~/components/Accounts";
 
-const { useChainId, useIsActivating, useIsActive, useProvider } = hooks;
+const {
+  useENSNames,
+  useChainId,
+  useIsActivating,
+  useIsActive,
+  useProvider,
+  useAccounts,
+} = hooks;
 
 export const action: ActionFunction = async ({ request, context }) => {
   console.log("doing the action");
@@ -51,6 +61,8 @@ export default function Index() {
   const isActive = useIsActive();
 
   const provider = useProvider();
+  const accounts = useAccounts();
+  const ENSNames = useENSNames();
 
   // console.log({
   //   chainId,
@@ -73,30 +85,63 @@ export default function Index() {
   }, []);
 
   return (
-    <div className="max-w-screen-2xl mx-auto h-screen flex flex-col items-center justify-center px-8 lg:px-0">
-      <div className="flex flex-col items-center justify-center">
-        <div className="max-w-3xl mx-auto">
-          <img
-            src="https://pixelady.s3.amazonaws.com/aura-petz/website_logo.webp"
-            width="1037"
-            height="172"
-            alt="milady aura petz"
-          />
-        </div>
-
-        {/* <Card
-            connector={metaMask}
-            activeChainId={chainId}
+    <>
+      {/* <div className="absolute bottom-0 left-0">Logos</div> */}
+      <div className="absolute top-0 left-0">
+        <div className="mt-8 ml-8">
+          <Status
             isActivating={isActivating}
             isActive={isActive}
             error={error}
-            chainIds={[1, 11155111]}
-            setError={setError}
+          />
+          <Accounts
             accounts={accounts}
             provider={provider}
             ENSNames={ENSNames}
-          /> */}
-        {/* <Form method="post">
+          />
+
+          {isActive ? (
+            <button
+              onClick={() => {
+                if (metaMask?.deactivate) {
+                  void metaMask.deactivate();
+                } else {
+                  void metaMask.resetState();
+                }
+                // setDesiredChainId(1);
+              }}
+              className="underline mt-3 tracking-wide"
+            >
+              Disconnect
+            </button>
+          ) : null}
+        </div>
+
+        {/* <Card
+          connector={metaMask}
+          activeChainId={chainId}
+          isActivating={isActivating}
+          isActive={isActive}
+          error={error}
+          chainIds={[1, 11155111]}
+          setError={setError}
+          accounts={accounts}
+          provider={provider}
+          ENSNames={ENSNames}
+        /> */}
+      </div>
+      <div className="max-w-screen-2xl mx-auto h-screen flex flex-col items-center justify-center px-8 lg:px-0 relative">
+        <div className="flex flex-col items-center justify-center">
+          <div className="max-w-3xl mx-auto">
+            <img
+              src="https://pixelady.s3.amazonaws.com/aura-petz/website_logo.webp"
+              width="1037"
+              height="172"
+              alt="milady aura petz"
+            />
+          </div>
+
+          {/* <Form method="post">
             <input
               type="hidden"
               name="address"
@@ -108,33 +153,34 @@ export default function Index() {
             </button>
           </Form> */}
 
-        <div className="w-72">
-          <img
-            src="https://pixelady.s3.amazonaws.com/aura-petz/bunny.webp"
-            width="352"
-            height="436"
-            alt="bunny pet"
-          />
-        </div>
-
-        {isActive ? (
-          <div className="mt-2">
-            <MintSection provider={provider} />
-          </div>
-        ) : (
-          <div className="w-[360px] -mt-10">
-            <ConnectWithSelect
-              connector={metaMask}
-              activeChainId={chainId}
-              chainIds={[1, 11155111]}
-              isActivating={isActivating}
-              isActive={isActive}
-              error={error}
-              setError={setError}
+          <div className="w-72">
+            <img
+              src="https://pixelady.s3.amazonaws.com/aura-petz/bunny.webp"
+              width="352"
+              height="436"
+              alt="bunny pet"
             />
           </div>
-        )}
+
+          {isActive ? (
+            <div className="mt-2">
+              <MintSection provider={provider} />
+            </div>
+          ) : (
+            <div className="w-[360px] -mt-10">
+              <ConnectWithSelect
+                connector={metaMask}
+                activeChainId={chainId}
+                chainIds={[1, 11155111]}
+                isActivating={isActivating}
+                isActive={isActive}
+                error={error}
+                setError={setError}
+              />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
