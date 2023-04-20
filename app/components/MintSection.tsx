@@ -3,6 +3,9 @@ import type { Contract } from "ethers"
 import { ethers } from "ethers"
 import { MintButton } from "./MintButton"
 import { useState } from "react"
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline"
+
+export const ETHERSCAN_DOMAIN = "https://etherscan.io"
 
 const address = "0xc8FAFEe7E6f3B3359A5FA850605C74520e19a5B6" // pixelady test goerli
 
@@ -38,8 +41,24 @@ async function getMaxQuantity(nftContract: Contract) {
   return maxQuantity
 }
 
+export type IMintModalDataV40 = {
+  txnHash: string
+  tokenIds: number[]
+  quantity: number
+  price: string
+  currencyAddress?: string
+}
+
 export function MintSection({ provider }: { provider?: Web3Provider }) {
   const [quantity, setQuantity] = useState<number>(1)
+
+  const [modalData, setModalData] = useState<IMintModalDataV40>({
+    txnHash: "",
+    tokenIds: [],
+    quantity: 0,
+    price: "0",
+    currencyAddress: ethers.constants.AddressZero,
+  })
 
   // mint from public invite list
   async function mintPublic() {
@@ -86,7 +105,27 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
       )
       console.log(`Transaction hash: ${tx.hash}`)
 
-      const receipt = await tx.wait()
+      setModalData((prev) => ({
+        ...prev,
+        txnHash: tx.hash,
+      }))
+
+      const receipt = await tx?.wait()
+
+      const transferEvents = (receipt as any).events.filter(
+        (evt: any) => evt.event === "Transfer"
+      )
+
+      const tokenIds = transferEvents.map((evt: any) =>
+        evt.args.tokenId.toString()
+      )
+
+      setModalData((prev) => ({
+        ...prev,
+        tokenIds,
+        txnHash: receipt.transactionHash,
+      }))
+
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`)
       console.log(`Gas used: ${receipt.gasUsed.toString()}`)
       // callback(true)
@@ -97,7 +136,52 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
     }
   }
 
-  return (
+  const congratsUi = (
+    <div className="flex flex-col text-white items-center">
+      Congrats!
+      <div className="mt-8 mb-4 text-center">
+        <p className="text-sm text-gray-500">
+          Token
+          {(modalData.tokenIds?.length || 1) > 1 ? "s" : ""} minted:
+        </p>
+        <div className="mt-3 space-y-2">
+          {modalData.tokenIds?.map((id) => (
+            <p key={id} className="">
+              <a
+                className="underline hover:no-underline text-sky-200"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`https://scatter.art/milady-aura-petz/${id}`}
+              >
+                Pet #{id}
+              </a>
+            </p>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  const pendingUi = (
+    <div className="flex flex-col text-white items-center">
+      <div className="flex items-center mx-auto text-center justify-center text-sm text-sky-300 group mt-2 mb-3">
+        <a
+          href={`${ETHERSCAN_DOMAIN}/tx/${modalData.txnHash}`}
+          target="_blank"
+          rel="noreferrer"
+          className="underline group-hover:no-underline"
+        >
+          View Transaction
+        </a>{" "}
+        <ArrowTopRightOnSquareIcon
+          className="ml-1 h-4 w-4 text-slate-500 group-hover:text-slate-600 group-hover:translate-x-1 transition-all"
+          aria-hidden="true"
+        />
+      </div>
+    </div>
+  )
+
+  const mintUi = (
     <div className="flex flex-col text-white items-center">
       <div className="flex flex-row justify-between items-center space-x-10">
         <div className="text-5xl font-normal">
@@ -143,4 +227,9 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
       </div>
     </div>
   )
+  return modalData.tokenIds.length
+    ? congratsUi
+    : modalData.txnHash
+    ? pendingUi
+    : mintUi
 }
