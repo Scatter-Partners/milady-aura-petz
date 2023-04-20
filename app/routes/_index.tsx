@@ -1,7 +1,9 @@
-import { ActionFunction, json } from "@remix-run/node";
-import { Form, V2_MetaFunction, useActionData } from "@remix-run/react";
-import { useEffect, useState } from "react";
-import { SiweMessage } from "~/utils/siwe.server";
+import type { ActionFunction } from "@remix-run/node"
+import { json } from "@remix-run/node"
+import type { V2_MetaFunction } from "@remix-run/react"
+import { useActionData } from "@remix-run/react"
+import { useEffect, useState } from "react"
+import { SiweMessage } from "~/utils/siwe.server"
 // import {siwe} from "~/utils/siwe.server";
 // const siwe = require("~/utils/siwe.server");
 // import siwe, {SiweMessage} from "~/utils/siwe.server"
@@ -9,9 +11,9 @@ import { SiweMessage } from "~/utils/siwe.server";
 
 // import { SiweStrategy } from "@sloikaxyz/remix-auth-siwe";
 
-import { ConnectWithSelect } from "~/components/ConnectWithSelect";
-import { hooks, metaMask } from "~/lib/connectors/metaMask";
-import EventEmitter from "~/utils/eventemitter.server";
+import { ConnectWithSelect } from "~/components/ConnectWithSelect"
+import { hooks, metaMask } from "~/lib/connectors/metaMask"
+import EventEmitter from "~/utils/eventemitter.server"
 
 const {
   useChainId,
@@ -20,11 +22,11 @@ const {
   useIsActive,
   useProvider,
   useENSNames,
-} = hooks;
+} = hooks
 
 export const meta: V2_MetaFunction = () => {
-  return [{ title: "New Remix App" }];
-};
+  return [{ title: "New Remix App" }]
+}
 
 // export const action = async ({ request }: ActionArgs) => {
 //   const formData = await request.formData();
@@ -33,19 +35,19 @@ export const meta: V2_MetaFunction = () => {
 // };
 
 export const action: ActionFunction = async ({ request, context }) => {
-  console.log("doing the action");
-  const formData = await request.formData();
-  console.log({ formData });
-  const address = formData.get("address") as string;
-  const statement = formData.get("statement") as string;
+  console.log("doing the action")
+  const formData = await request.formData()
+  console.log({ formData })
+  const address = formData.get("address") as string
+  const statement = formData.get("statement") as string
   // const project = await createProject(body);
-  const EE = new EventEmitter();
+  const EE = new EventEmitter()
 
-  console.log({ EE });
+  console.log({ EE })
 
   // console.log({siwe, SiweMessage})
   // console.log({siwe})
-  console.log({ context });
+  console.log({ context })
 
   try {
     const siweOptions = {
@@ -55,17 +57,17 @@ export const action: ActionFunction = async ({ request, context }) => {
       uri: "https://localhost:4000/",
       version: "1",
       chainId: 1,
-    };
-    console.log({ siweOptions });
-    const message = new SiweMessage(siweOptions);
+    }
+    console.log({ siweOptions })
+    const message = new SiweMessage(siweOptions)
 
-    const preparedMessage = message.prepareMessage();
-    console.log({ message });
-    console.log(preparedMessage);
-    return json({ message: preparedMessage });
+    const preparedMessage = message.prepareMessage()
+    console.log({ message })
+    console.log(preparedMessage)
+    return json({ message: preparedMessage })
   } catch (error) {
-    console.log({ error });
-    return json({ error });
+    console.log({ error })
+    return json({ error })
   }
   // sign siwe message
 
@@ -102,26 +104,26 @@ export const action: ActionFunction = async ({ request, context }) => {
   //   failureRedirect: "/login",
   //   context, // optional
   // });
-};
+}
 
 export default function Index() {
   // const authenticate = useCallback(async () => {
   //   // siweMessageOptions: null;
   //   // create siwe message
   // }, [submit]);
-  const actionData = useActionData<typeof action>();
-  console.log({ actionData });
+  const actionData = useActionData<typeof action>()
+  console.log({ actionData })
 
-  const chainId = useChainId();
-  const accounts = useAccounts();
-  const isActivating = useIsActivating();
+  const chainId = useChainId()
+  const accounts = useAccounts()
+  const isActivating = useIsActivating()
 
-  const isActive = useIsActive();
+  const isActive = useIsActive()
 
-  const provider = useProvider();
-  const ENSNames = useENSNames(provider);
+  const provider = useProvider()
+  const ENSNames = useENSNames(provider)
 
-  const signer = provider?.getSigner();
+  const signer = provider?.getSigner()
 
   console.log({
     chainId,
@@ -131,43 +133,43 @@ export default function Index() {
     provider,
     ENSNames,
     signer,
-  });
+  })
 
-  const [error, setError] = useState<Error>();
+  const [error, setError] = useState<Error>()
 
-  const statement = "This is a test statement.";
+  const statement = "This is a test statement."
 
   // attempt to connect eagerly on mount
   useEffect(() => {
-    console.log("eagerly connecting to MM");
+    console.log("eagerly connecting to MM")
 
     void metaMask.connectEagerly().catch(() => {
-      console.debug("Failed to connect eagerly to metamask");
-    });
-  }, []);
+      console.debug("Failed to connect eagerly to metamask")
+    })
+  }, [])
 
   useEffect(() => {
-    (async function getSignature() {
+    ;(async function getSignature() {
       if (!actionData?.message || !provider) {
-        return;
+        return
       }
 
-      const signer = provider?.getSigner();
+      const signer = provider?.getSigner()
 
-      const signature = await signer.signMessage(actionData.message);
+      const signature = await signer.signMessage(actionData.message)
 
-      console.log({ signature });
-    })();
-  }, [actionData?.message]);
+      console.log({ signature })
+    })()
+  }, [actionData?.message, provider])
 
-  const imageUrl = "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp";
+  const imageUrl = "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp"
 
   return (
     <div
       className="bg-repeat h-full min-h-screen"
       style={{ backgroundImage: `url(${imageUrl})` }}
     >
-      <div className="max-w-screen-2xl mx-auto border border-yellow-100 h-screen flex flex-col items-center justify-center px-8 lg:px-0">
+      <div className="max-w-screen-2xl mx-auto h-screen flex flex-col items-center justify-center px-8 lg:px-0">
         <div className="flex flex-col items-center justify-center">
           <div>
             <img
@@ -227,7 +229,7 @@ export default function Index() {
         /> */}
       </div>
     </div>
-  );
+  )
 }
 
 {
