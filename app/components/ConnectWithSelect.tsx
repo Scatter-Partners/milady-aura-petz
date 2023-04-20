@@ -1,25 +1,25 @@
-import type { Web3ReactHooks } from "@web3-react/core";
-import type { MetaMask } from "@web3-react/metamask";
-import { Network } from "@web3-react/network";
-import { useCallback, useEffect, useState } from "react";
+import type { Web3ReactHooks } from "@web3-react/core"
+import type { MetaMask } from "@web3-react/metamask"
+import { Network } from "@web3-react/network"
+import { useCallback, useEffect, useState } from "react"
 
-import { CHAINS, getAddChainParameters } from "~/lib/chains";
-import { HoverButton } from "./HoverButton";
+import { CHAINS, getAddChainParameters } from "~/lib/chains"
+import { ConnectButton } from "./HoverButton"
 
 export function ChainSelect({
   activeChainId,
   switchChain,
   chainIds,
 }: {
-  activeChainId?: number;
-  switchChain: (chainId: number) => void;
-  chainIds: (number | undefined)[];
+  activeChainId?: number
+  switchChain: (chainId: number) => void
+  chainIds: (number | undefined)[]
 }) {
   return (
     <select
       value={activeChainId}
       onChange={(event) => {
-        switchChain(Number(event.target.value));
+        switchChain(Number(event.target.value))
       }}
       disabled={switchChain === undefined}
     >
@@ -44,7 +44,7 @@ export function ChainSelect({
           </option>
         ))}
     </select>
-  );
+  )
 }
 
 export function ConnectWithSelect({
@@ -56,34 +56,34 @@ export function ConnectWithSelect({
   error,
   setError,
 }: {
-  connector: MetaMask | Network;
-  activeChainId: ReturnType<Web3ReactHooks["useChainId"]>;
-  chainIds: ReturnType<Web3ReactHooks["useChainId"]>[];
-  isActivating: ReturnType<Web3ReactHooks["useIsActivating"]>;
-  isActive: ReturnType<Web3ReactHooks["useIsActive"]>;
-  error: Error | undefined;
-  setError: (error: Error | undefined) => void;
+  connector: MetaMask | Network
+  activeChainId: ReturnType<Web3ReactHooks["useChainId"]>
+  chainIds: ReturnType<Web3ReactHooks["useChainId"]>[]
+  isActivating: ReturnType<Web3ReactHooks["useIsActivating"]>
+  isActive: ReturnType<Web3ReactHooks["useIsActive"]>
+  error: Error | undefined
+  setError: (error: Error | undefined) => void
 }) {
-  const [desiredChainId, setDesiredChainId] = useState<number>(1);
+  //todo: restore this to 1
+  const [desiredChainId, setDesiredChainId] = useState<number>(11155111)
 
   /**
    * When user connects eagerly (`desiredChainId` is undefined) or to the default chain (`desiredChainId` is -1),
    * update the `desiredChainId` value so that <select /> has the right selection.
    */
-  console.log({ desiredChainId });
+  console.log({ desiredChainId })
 
   useEffect(() => {
-    console.log({ desiredChainId, activeChainId });
+    console.log({ desiredChainId, activeChainId })
 
     if (activeChainId && (!desiredChainId || desiredChainId === -1)) {
-      setDesiredChainId(activeChainId);
+      setDesiredChainId(activeChainId)
     }
-    // }, [desiredChainId, activeChainId]);
-  }, []);
+  }, [desiredChainId, activeChainId])
 
   const switchChain = useCallback(
     async (desiredChainId: number) => {
-      setDesiredChainId(desiredChainId);
+      setDesiredChainId(desiredChainId)
 
       try {
         if (
@@ -92,23 +92,23 @@ export function ConnectWithSelect({
           // If they want to connect to the default chain and we're already connected, return
           (desiredChainId === -1 && activeChainId !== undefined)
         ) {
-          setError(undefined);
-          return;
+          setError(undefined)
+          return
         }
 
         if (connector instanceof Network) {
-          await connector.activate(desiredChainId);
+          await connector.activate(desiredChainId)
         } else {
-          await connector.activate(getAddChainParameters(desiredChainId));
+          await connector.activate(getAddChainParameters(desiredChainId))
         }
 
-        setError(undefined);
+        setError(undefined)
       } catch (error: any) {
-        setError(error);
+        setError(error)
       }
     },
     [connector, activeChainId, setError]
-  );
+  )
 
   const _disconnect = error ? (
     <button onClick={() => switchChain(desiredChainId)}>Try again?</button>
@@ -116,36 +116,28 @@ export function ConnectWithSelect({
     <button
       onClick={() => {
         if (connector?.deactivate) {
-          void connector.deactivate();
+          void connector.deactivate()
         } else {
-          void connector.resetState();
+          void connector.resetState()
         }
         // setDesiredChainId(1);
       }}
     >
       Disconnect
     </button>
-  );
+  )
 
   return (
-    <div className="flex flex-col text-white">
+    <div className="flex flex-col text-white w-full">
       {/* <ChainSelect
         activeChainId={desiredChainId}
         switchChain={switchChain}
         chainIds={chainIds}
       /> */}
-      <div style={{ marginBottom: "1rem" }} />
-      {isActive ? null : (
-        <HoverButton
-          onClick={() => switchChain(desiredChainId)}
-          disabled={isActivating || !desiredChainId}
-        />
-        // <button
-        // >
-        //   {error ? "Try again?" : "Connect"}" "{isActivating.toString()}{" "}
-        //   {desiredChainId}
-        // </button>
-      )}
+      <ConnectButton
+        onClick={() => switchChain(desiredChainId)}
+        disabled={isActivating || !desiredChainId}
+      />
     </div>
-  );
+  )
 }

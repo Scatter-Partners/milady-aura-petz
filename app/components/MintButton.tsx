@@ -1,25 +1,25 @@
 import { useState } from "react"
 
-export function ConnectButton({
-  onClick,
+export function MintButton({
+  handleClick,
   disabled = false,
 }: {
-  onClick: React.MouseEventHandler<HTMLButtonElement>
+  handleClick?: React.MouseEventHandler<HTMLButtonElement>
   disabled?: boolean
 }) {
   const [hover, setHover] = useState(false)
 
   return (
-    <button onClick={onClick} disabled={disabled}>
+    <button onClick={handleClick} disabled={disabled}>
       <img
         src={
           hover
-            ? "https://pixelady.s3.amazonaws.com/aura-petz/connect_selected.webp"
-            : "https://pixelady.s3.amazonaws.com/aura-petz/connect_unselected.webp"
+            ? "https://pixelady.s3.amazonaws.com/aura-petz/mint_button_unselected_small.webp"
+            : "https://pixelady.s3.amazonaws.com/aura-petz/mint_button_selected_small.webp"
         }
-        width="611"
-        height="394"
-        alt="connect wallet"
+        width="284"
+        height="140"
+        alt="mint petz"
         style={{ transition: "filter 0.5s ease-in-out" }}
         className={`w-full cursor-pointer transition-all duration-500 $${
           hover ? "filter brightness-75" : ""
