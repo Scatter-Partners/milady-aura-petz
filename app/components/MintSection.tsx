@@ -193,7 +193,7 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
     let invite = await nftContract.invites(privateListRoot);
 
     let price = (invite["price"] * quantity).toString();
-    let auth = [privateListRoot, proof];
+    let auth = [privateListRoot, proof.theProof];
     let affiliate = ethers.constants.AddressZero;
     let affiliateSigner = ethers.constants.HashZero;
 
