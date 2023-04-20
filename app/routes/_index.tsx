@@ -2,12 +2,13 @@ import type { ActionFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useActionData } from "@remix-run/react"
 import { useEffect, useState } from "react"
-import { SiweMessage } from "~/utils/siwe.server"
+import { SiweMessage } from "~/lib/utils/siwe.server"
 // import { SiweStrategy } from "@sloikaxyz/remix-auth-siwe";
-
 import { ConnectWithSelect } from "~/components/ConnectWithSelect"
 import { hooks, metaMask } from "~/lib/connectors/metaMask"
-import EventEmitter from "~/utils/eventemitter.server"
+import EventEmitter from "~/lib/utils/eventemitter.server"
+import { MintSection } from "~/components/MintSection"
+import { Card } from "~/components/Card"
 
 const {
   useChainId,
@@ -113,17 +114,17 @@ export default function Index() {
   const provider = useProvider()
   const ENSNames = useENSNames(provider)
 
-  const signer = provider?.getSigner()
+  // const signer = provider?.getSigner()
 
-  console.log({
-    chainId,
-    accounts,
-    isActivating,
-    isActive,
-    provider,
-    ENSNames,
-    signer,
-  })
+  // console.log({
+  //   chainId,
+  //   accounts,
+  //   isActivating,
+  //   isActive,
+  //   provider,
+  //   ENSNames,
+  //   signer,
+  // })
 
   const [error, setError] = useState<Error>()
   //
@@ -152,12 +153,13 @@ export default function Index() {
     })()
   }, [actionData?.message, provider])
 
-  const imageUrl = "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp"
+  const backgroundImageUrl =
+    "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp"
 
   return (
     <div
-      className="bg-repeat h-full min-h-screen"
-      style={{ backgroundImage: `url(${imageUrl})` }}
+      className="bg-repeat h-full min-h-screen text-white"
+      style={{ backgroundImage: `url(${backgroundImageUrl})` }}
     >
       <div className="max-w-screen-2xl mx-auto h-screen flex flex-col items-center justify-center px-8 lg:px-0">
         <div className="flex flex-col items-center justify-center">
@@ -170,6 +172,18 @@ export default function Index() {
             />
           </div>
 
+          {/* <Card
+            connector={metaMask}
+            activeChainId={chainId}
+            isActivating={isActivating}
+            isActive={isActive}
+            error={error}
+            chainIds={[1, 11155111]}
+            setError={setError}
+            accounts={accounts}
+            provider={provider}
+            ENSNames={ENSNames}
+          /> */}
           {/* <Form method="post">
             <input
               type="hidden"
@@ -191,32 +205,24 @@ export default function Index() {
             />
           </div>
 
-          <div className="w-[360px] -mt-10">
-            <ConnectWithSelect
-              connector={metaMask}
-              activeChainId={chainId}
-              chainIds={[1, 11155111]}
-              isActivating={isActivating}
-              isActive={isActive}
-              error={error}
-              setError={setError}
-            />
-
-            {/* <HoverButton /> */}
-          </div>
+          {isActive ? (
+            <div className="mt-2">
+              <MintSection provider={provider} />
+            </div>
+          ) : (
+            <div className="w-[360px] -mt-10">
+              <ConnectWithSelect
+                connector={metaMask}
+                activeChainId={chainId}
+                chainIds={[1, 11155111]}
+                isActivating={isActivating}
+                isActive={isActive}
+                error={error}
+                setError={setError}
+              />
+            </div>
+          )}
         </div>
-        {/* <Card
-          connector={metaMask}
-          activeChainId={chainId}
-          isActivating={isActivating}
-          isActive={isActive}
-          error={error}
-          chainIds={[1, 11155111]}
-          setError={setError}
-          accounts={accounts}
-          provider={provider}
-          ENSNames={ENSNames}
-        /> */}
       </div>
     </div>
   )
@@ -232,7 +238,4 @@ export default function Index() {
         <input type="hidden" name="statement" value={statement} />
         <button type="submit">Sign In</button>
         {/* <button type="submit">Sign In</button> */
-}
-{
-  /* </Form> */
 }

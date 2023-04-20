@@ -4,7 +4,7 @@ import { Network } from "@web3-react/network"
 import { useCallback, useEffect, useState } from "react"
 
 import { CHAINS, getAddChainParameters } from "~/lib/chains"
-import { HoverButton } from "./HoverButton"
+import { ConnectButton } from "./HoverButton"
 
 export function ChainSelect({
   activeChainId,
@@ -64,7 +64,8 @@ export function ConnectWithSelect({
   error: Error | undefined
   setError: (error: Error | undefined) => void
 }) {
-  const [desiredChainId, setDesiredChainId] = useState<number>(1)
+  //todo: restore this to 1
+  const [desiredChainId, setDesiredChainId] = useState<number>(11155111)
 
   /**
    * When user connects eagerly (`desiredChainId` is undefined) or to the default chain (`desiredChainId` is -1),
@@ -133,17 +134,10 @@ export function ConnectWithSelect({
         switchChain={switchChain}
         chainIds={chainIds}
       /> */}
-      {isActive ? null : (
-        <HoverButton
-          onClick={() => switchChain(desiredChainId)}
-          disabled={isActivating || !desiredChainId}
-        />
-        // <button
-        // >
-        //   {error ? "Try again?" : "Connect"}" "{isActivating.toString()}{" "}
-        //   {desiredChainId}
-        // </button>
-      )}
+      <ConnectButton
+        onClick={() => switchChain(desiredChainId)}
+        disabled={isActivating || !desiredChainId}
+      />
     </div>
   )
 }
