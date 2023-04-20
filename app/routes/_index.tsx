@@ -1,14 +1,14 @@
-import type { ActionFunction } from "@remix-run/node"
-import { json } from "@remix-run/node"
-import { useActionData } from "@remix-run/react"
-import { useEffect, useState } from "react"
-import { SiweMessage } from "~/lib/utils/siwe.server"
+import type { ActionFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useActionData } from "@remix-run/react";
+import { useEffect, useState } from "react";
+import { SiweMessage } from "~/lib/utils/siwe.server";
 // import { SiweStrategy } from "@sloikaxyz/remix-auth-siwe";
-import { ConnectWithSelect } from "~/components/ConnectWithSelect"
-import { hooks, metaMask } from "~/lib/connectors/metaMask"
-import EventEmitter from "~/lib/utils/eventemitter.server"
-import { MintSection } from "~/components/MintSection"
-import { Card } from "~/components/Card"
+import { ConnectWithSelect } from "~/components/ConnectWithSelect";
+import { hooks, metaMask } from "~/lib/connectors/metaMask";
+import EventEmitter from "~/lib/utils/eventemitter.server";
+import { MintSection } from "~/components/MintSection";
+import { Card } from "~/components/Card";
 
 const {
   useChainId,
@@ -17,7 +17,7 @@ const {
   useIsActive,
   useProvider,
   useENSNames,
-} = hooks
+} = hooks;
 
 // export const action = async ({ request }: ActionArgs) => {
 //   const formData = await request.formData();
@@ -26,19 +26,19 @@ const {
 // };
 
 export const action: ActionFunction = async ({ request, context }) => {
-  console.log("doing the action")
-  const formData = await request.formData()
-  console.log({ formData })
-  const address = formData.get("address") as string
-  const statement = formData.get("statement") as string
+  console.log("doing the action");
+  const formData = await request.formData();
+  console.log({ formData });
+  const address = formData.get("address") as string;
+  const statement = formData.get("statement") as string;
   // const project = await createProject(body);
-  const EE = new EventEmitter()
+  const EE = new EventEmitter();
 
-  console.log({ EE })
+  console.log({ EE });
 
   // console.log({siwe, SiweMessage})
   // console.log({siwe})
-  console.log({ context })
+  console.log({ context });
 
   try {
     const siweOptions = {
@@ -48,71 +48,36 @@ export const action: ActionFunction = async ({ request, context }) => {
       uri: "https://localhost:4000/",
       version: "1",
       chainId: 1,
-    }
-    console.log({ siweOptions })
-    const message = new SiweMessage(siweOptions)
+    };
+    console.log({ siweOptions });
+    const message = new SiweMessage(siweOptions);
 
-    const preparedMessage = message.prepareMessage()
-    console.log({ message })
-    console.log(preparedMessage)
-    return json({ message: preparedMessage })
+    const preparedMessage = message.prepareMessage();
+    console.log({ message });
+    console.log(preparedMessage);
+    return json({ message: preparedMessage });
   } catch (error) {
-    console.log({ error })
-    return json({ error })
+    console.log({ error });
+    return json({ error });
   }
-  // sign siwe message
-
-  // const signer = provider?.getSigner();
-
-  // const signature = await signer.signMessage(message);
-
-  // let authenticator = new Authenticator<IUser>(sessionStorage, {
-  //   sessionKey: "sessionKey", // keep in sync
-  //   sessionErrorKey: "sessionErrorKey", // keep in sync
-  // });
-
-  // authenticator.use(
-  //   new SiweStrategy({ domain: "localhost:4000" }, async ({ message }) => {
-  //     return await Promise.resolve({
-  //       address: message.address,
-  //       username: "bozo-the-clown",
-  //     });
-  //   }),
-  //   "siwe"
-  // );
-
-  // const formData = new FormData();
-  // formData.append("message", message);
-  // formData.append("signature", signature);
-  // submit(formData, {
-  //   action: { YOUR_LOGIN_ACTION },
-  //   method: "post",
-  //   replace: true,
-  // });
-
-  // await authenticator.authenticate("siwe", request, {
-  //   successRedirect: "/",
-  //   failureRedirect: "/login",
-  //   context, // optional
-  // });
-}
+};
 
 export default function Index() {
   // const authenticate = useCallback(async () => {
   //   // siweMessageOptions: null;
   //   // create siwe message
   // }, [submit]);
-  const actionData = useActionData<typeof action>()
-  console.log({ actionData })
+  // const actionData = useActionData<typeof action>();
+  // console.log({ actionData });
 
-  const chainId = useChainId()
-  const accounts = useAccounts()
-  const isActivating = useIsActivating()
+  const chainId = useChainId();
+  const accounts = useAccounts();
+  const isActivating = useIsActivating();
 
-  const isActive = useIsActive()
+  const isActive = useIsActive();
 
-  const provider = useProvider()
-  const ENSNames = useENSNames(provider)
+  const provider = useProvider();
+  const ENSNames = useENSNames(provider);
 
   // const signer = provider?.getSigner()
 
@@ -126,35 +91,35 @@ export default function Index() {
   //   signer,
   // })
 
-  const [error, setError] = useState<Error>()
+  const [error, setError] = useState<Error>();
   //
   // const statement = "This is a test statement."
 
   // attempt to connect eagerly on mount
   useEffect(() => {
-    console.log("eagerly connecting to MM")
+    console.log("eagerly connecting to MM");
 
     void metaMask.connectEagerly().catch(() => {
-      console.debug("Failed to connect eagerly to metamask")
-    })
-  }, [])
+      console.debug("Failed to connect eagerly to metamask");
+    });
+  }, []);
 
-  useEffect(() => {
-    ;(async function getSignature() {
-      if (!actionData?.message || !provider) {
-        return
-      }
+  // useEffect(() => {
+  //   ;(async function getSignature() {
+  //     if (!actionData?.message || !provider) {
+  //       return
+  //     }
 
-      const signer = provider?.getSigner()
+  //     const signer = provider?.getSigner()
 
-      const signature = await signer.signMessage(actionData.message)
+  //     const signature = await signer.signMessage(actionData.message)
 
-      console.log({ signature })
-    })()
-  }, [actionData?.message, provider])
+  //     console.log({ signature })
+  //   })()
+  // }, [actionData?.message, provider])
 
   const backgroundImageUrl =
-    "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp"
+    "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp";
 
   return (
     <div
@@ -225,7 +190,7 @@ export default function Index() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 {
