@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 export const ETHERSCAN_DOMAIN = "https://etherscan.io";
-// export const API_URL = "https://scatter-api.fly.dev"
-export const API_URL = "https://scatter-api-testing.fly.dev";
+export const API_URL = "https://scatter-api.fly.dev";
+// export const API_URL = "https://scatter-api-testing.fly.dev";
 
-const address = "0xc8FAFEe7E6f3B3359A5FA850605C74520e19a5B6"; // pixelady test goerli
+const address = "0xc62E3fd5B02618f90dD07d1E478963038fA9089c";
 const root =
   "0x66e915aa20ae05002bc22942644e1520cf77a628aefadff9248f0b42c4d80bd0";
 
@@ -67,6 +67,8 @@ export function MintSection({ provider }: { provider?: Web3Provider }) {
     price: "0",
     currencyAddress: ethers.constants.AddressZero,
   });
+
+  console.log({ provider });
 
   useEffect(() => {
     (async function fetchProof() {

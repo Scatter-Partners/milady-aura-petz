@@ -1,4 +1,4 @@
-import type { LinksFunction } from "@remix-run/node"
+import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -6,13 +6,16 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react"
+} from "@remix-run/react";
 
-import stylesheet from "~/tailwind.css"
+import stylesheet from "~/tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
-]
+];
+
+const backgroundImageUrl =
+  "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp";
 
 export default function App() {
   return (
@@ -44,12 +47,15 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body
+        className="bg-repeat h-full min-h-screen text-white"
+        style={{ backgroundImage: `url(${backgroundImageUrl})` }}
+      >
         <Outlet />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>
     </html>
-  )
+  );
 }
