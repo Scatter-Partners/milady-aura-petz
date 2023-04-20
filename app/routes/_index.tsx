@@ -1,4 +1,4 @@
-import { ActionFunction, json, redirect } from "@remix-run/node";
+import { ActionFunction, json } from "@remix-run/node";
 import { Form, V2_MetaFunction, useActionData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { SiweMessage } from "~/utils/siwe.server";
@@ -8,16 +8,10 @@ import { SiweMessage } from "~/utils/siwe.server";
 // import siwe from "~/utils/siwe.server"
 
 // import { SiweStrategy } from "@sloikaxyz/remix-auth-siwe";
-import { Authenticator } from "remix-auth";
 
-import type { IUser } from "~/services/session.server";
-import { sessionStorage } from "~/services/session.server";
-import siwe from "siwe";
-
-import { Card } from "~/components/Card";
-import { hooks, metaMask } from "~/lib/connectors/metaMask";
-import { HoverButton } from "~/components/HoverButton";
 import { ConnectWithSelect } from "~/components/ConnectWithSelect";
+import { hooks, metaMask } from "~/lib/connectors/metaMask";
+import EventEmitter from "~/utils/eventemitter.server";
 
 const {
   useChainId,
@@ -45,6 +39,9 @@ export const action: ActionFunction = async ({ request, context }) => {
   const address = formData.get("address") as string;
   const statement = formData.get("statement") as string;
   // const project = await createProject(body);
+  const EE = new EventEmitter();
+
+  console.log({ EE });
 
   // console.log({siwe, SiweMessage})
   // console.log({siwe})
@@ -68,6 +65,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     return json({ message: preparedMessage });
   } catch (error) {
     console.log({ error });
+    return json({ error });
   }
   // sign siwe message
 
@@ -179,6 +177,19 @@ export default function Index() {
               alt="milady aura petz"
             />
           </div>
+
+          {/* <Form method="post">
+            <input
+              type="hidden"
+              name="address"
+              value={accounts ? accounts[0] : ""}
+            />
+            <input type="hidden" name="statement" value={statement} />
+            <button type="submit" className="text-white">
+              Sign In
+            </button>
+          </Form> */}
+
           <div>
             <img
               src="https://pixelady.s3.amazonaws.com/aura-petz/bunny.webp"
