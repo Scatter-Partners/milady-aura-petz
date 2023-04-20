@@ -4,7 +4,7 @@ import { Network } from "@web3-react/network"
 import { useCallback, useEffect, useState } from "react"
 
 import { CHAINS, getAddChainParameters } from "~/lib/chains"
-import { HoverButton } from "./HoverButton"
+import { ConnectButton } from "./HoverButton"
 
 export function ChainSelect({
   activeChainId,
@@ -133,17 +133,10 @@ export function ConnectWithSelect({
         switchChain={switchChain}
         chainIds={chainIds}
       /> */}
-      {isActive ? null : (
-        <HoverButton
-          onClick={() => switchChain(desiredChainId)}
-          disabled={isActivating || !desiredChainId}
-        />
-        // <button
-        // >
-        //   {error ? "Try again?" : "Connect"}" "{isActivating.toString()}{" "}
-        //   {desiredChainId}
-        // </button>
-      )}
+      <ConnectButton
+        onClick={() => switchChain(desiredChainId)}
+        disabled={isActivating || !desiredChainId}
+      />
     </div>
   )
 }

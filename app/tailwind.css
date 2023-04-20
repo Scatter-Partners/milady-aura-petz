@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --tw-ring-color: #ff0000; /* override the global ring color to red */
+}
