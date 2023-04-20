@@ -64,7 +64,8 @@ export function ConnectWithSelect({
   error: Error | undefined
   setError: (error: Error | undefined) => void
 }) {
-  const [desiredChainId, setDesiredChainId] = useState<number>(1)
+  //todo: restore this to 1
+  const [desiredChainId, setDesiredChainId] = useState<number>(11155111)
 
   /**
    * When user connects eagerly (`desiredChainId` is undefined) or to the default chain (`desiredChainId` is -1),
