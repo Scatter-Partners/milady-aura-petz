@@ -160,50 +160,33 @@ export default function Index() {
     })();
   }, [actionData?.message]);
 
+  const imageUrl = "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp";
+
   return (
-    <div>
-      <Card
-        connector={metaMask}
-        activeChainId={chainId}
-        isActivating={isActivating}
-        isActive={isActive}
-        error={error}
-        chainIds={[1, 11155111]}
-        setError={setError}
-        accounts={accounts}
-        provider={provider}
-        ENSNames={ENSNames}
-      />
-      <h1 className="text-3xl text-amber-600 font-bold underline">
-        Hello Tailwind!
-      </h1>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Bog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
-      <Form method="post">
+    <div
+      className="bg-cover bg-center h-screen"
+      style={{ backgroundImage: `url(${imageUrl})` }}
+    >
+      <div className="max-w-screen-2xl mx-auto pt-36 border border-yellow-100">
+        <Card
+          connector={metaMask}
+          activeChainId={chainId}
+          isActivating={isActivating}
+          isActive={isActive}
+          error={error}
+          chainIds={[1, 11155111]}
+          setError={setError}
+          accounts={accounts}
+          provider={provider}
+          ENSNames={ENSNames}
+        />
+      </div>
+    </div>
+  );
+}
+
+{
+  /* <Form method="post">
         <input
           type="hidden"
           name="address"
@@ -211,9 +194,8 @@ export default function Index() {
         />
         <input type="hidden" name="statement" value={statement} />
         <button type="submit">Sign In</button>
-        {/* <button type="submit">Sign In</button> */}
-      </Form>
-      {/* <button onClick={authenticate}>Sign In</button>; */}
-    </div>
-  );
+        {/* <button type="submit">Sign In</button> */
+}
+{
+  /* </Form> */
 }
