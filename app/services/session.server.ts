@@ -14,3 +14,21 @@ export let sessionStorage = createCookieSessionStorage({
 
 // you can also export the methods individually for your own usage
 export let { getSession, commitSession, destroySession } = sessionStorage;
+
+export type IUser = {
+  // _id?: string;
+  username: string | null;
+  // address: string;
+  // address_lowercase: string;
+  // avatar_uri: string;
+  // banner_uri: string;
+  // description: string;
+  // joined_time: Date;
+  // token?: string;
+  // nonce: number;
+  // signature?: string;
+  // isActiveUser?: boolean;
+  // accessToken?: string;
+  // is_valid_affiliate?: boolean;
+  // ens?: string;
+};
