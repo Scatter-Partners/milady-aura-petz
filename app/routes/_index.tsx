@@ -16,6 +16,8 @@ import siwe from "siwe";
 
 import { Card } from "~/components/Card";
 import { hooks, metaMask } from "~/lib/connectors/metaMask";
+import { HoverButton } from "~/components/HoverButton";
+import { ConnectWithSelect } from "~/components/ConnectWithSelect";
 
 const {
   useChainId,
@@ -160,50 +162,65 @@ export default function Index() {
     })();
   }, [actionData?.message]);
 
+  const imageUrl = "https://pixelady.s3.amazonaws.com/aura-petz/BLACK_CRT.webp";
+
   return (
-    <div>
-      <Card
-        connector={metaMask}
-        activeChainId={chainId}
-        isActivating={isActivating}
-        isActive={isActive}
-        error={error}
-        chainIds={[1, 11155111]}
-        setError={setError}
-        accounts={accounts}
-        provider={provider}
-        ENSNames={ENSNames}
-      />
-      <h1 className="text-3xl text-amber-600 font-bold underline">
-        Hello Tailwind!
-      </h1>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Bog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
-      <Form method="post">
+    <div
+      className="bg-repeat h-full min-h-screen"
+      style={{ backgroundImage: `url(${imageUrl})` }}
+    >
+      <div className="max-w-screen-2xl mx-auto border border-yellow-100 h-screen flex flex-col items-center justify-center px-8 lg:px-0">
+        <div className="flex flex-col items-center justify-center">
+          <div>
+            <img
+              src="https://pixelady.s3.amazonaws.com/aura-petz/website_logo.webp"
+              width="1037"
+              height="172"
+              alt="milady aura petz"
+            />
+          </div>
+          <div>
+            <img
+              src="https://pixelady.s3.amazonaws.com/aura-petz/bunny.webp"
+              width="352"
+              height="436"
+              alt="bunny pet"
+            />
+          </div>
+
+          <div className="">
+            <ConnectWithSelect
+              connector={metaMask}
+              activeChainId={chainId}
+              chainIds={[1, 11155111]}
+              isActivating={isActivating}
+              isActive={isActive}
+              error={error}
+              setError={setError}
+            />
+
+            {/* <HoverButton /> */}
+          </div>
+        </div>
+        {/* <Card
+          connector={metaMask}
+          activeChainId={chainId}
+          isActivating={isActivating}
+          isActive={isActive}
+          error={error}
+          chainIds={[1, 11155111]}
+          setError={setError}
+          accounts={accounts}
+          provider={provider}
+          ENSNames={ENSNames}
+        /> */}
+      </div>
+    </div>
+  );
+}
+
+{
+  /* <Form method="post">
         <input
           type="hidden"
           name="address"
@@ -211,9 +228,8 @@ export default function Index() {
         />
         <input type="hidden" name="statement" value={statement} />
         <button type="submit">Sign In</button>
-        {/* <button type="submit">Sign In</button> */}
-      </Form>
-      {/* <button onClick={authenticate}>Sign In</button>; */}
-    </div>
-  );
+        {/* <button type="submit">Sign In</button> */
+}
+{
+  /* </Form> */
 }
