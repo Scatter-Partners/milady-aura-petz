@@ -1,14 +1,8 @@
 import type { ActionFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import type { V2_MetaFunction } from "@remix-run/react"
 import { useActionData } from "@remix-run/react"
 import { useEffect, useState } from "react"
 import { SiweMessage } from "~/utils/siwe.server"
-// import {siwe} from "~/utils/siwe.server";
-// const siwe = require("~/utils/siwe.server");
-// import siwe, {SiweMessage} from "~/utils/siwe.server"
-// import siwe from "~/utils/siwe.server"
-
 // import { SiweStrategy } from "@sloikaxyz/remix-auth-siwe";
 
 import { ConnectWithSelect } from "~/components/ConnectWithSelect"
@@ -23,10 +17,6 @@ const {
   useProvider,
   useENSNames,
 } = hooks
-
-export const meta: V2_MetaFunction = () => {
-  return [{ title: "New Remix App" }]
-}
 
 // export const action = async ({ request }: ActionArgs) => {
 //   const formData = await request.formData();
@@ -136,8 +126,8 @@ export default function Index() {
   })
 
   const [error, setError] = useState<Error>()
-
-  const statement = "This is a test statement."
+  //
+  // const statement = "This is a test statement."
 
   // attempt to connect eagerly on mount
   useEffect(() => {
@@ -171,7 +161,7 @@ export default function Index() {
     >
       <div className="max-w-screen-2xl mx-auto h-screen flex flex-col items-center justify-center px-8 lg:px-0">
         <div className="flex flex-col items-center justify-center">
-          <div>
+          <div className="max-w-3xl mx-auto">
             <img
               src="https://pixelady.s3.amazonaws.com/aura-petz/website_logo.webp"
               width="1037"
@@ -192,7 +182,7 @@ export default function Index() {
             </button>
           </Form> */}
 
-          <div>
+          <div className="w-72">
             <img
               src="https://pixelady.s3.amazonaws.com/aura-petz/bunny.webp"
               width="352"
@@ -201,7 +191,7 @@ export default function Index() {
             />
           </div>
 
-          <div className="">
+          <div className="w-[360px] -mt-10">
             <ConnectWithSelect
               connector={metaMask}
               activeChainId={chainId}

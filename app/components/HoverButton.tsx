@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState } from "react"
 
 export function HoverButton({
   onClick,
   disabled = false,
 }: {
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-  disabled?: boolean;
+  onClick: React.MouseEventHandler<HTMLButtonElement>
+  disabled?: boolean
 }) {
-  const [hover, setHover] = useState(false);
+  const [hover, setHover] = useState(false)
 
   return (
     <button onClick={onClick} disabled={disabled}>
@@ -21,12 +21,12 @@ export function HoverButton({
         height="394"
         alt="connect wallet"
         style={{ transition: "filter 0.5s ease-in-out" }}
-        className={`w-[420px] -mt-20 cursor-pointer transition-all duration-500 $${
+        className={`w-full cursor-pointer transition-all duration-500 $${
           hover ? "filter brightness-75" : ""
         }`}
         onMouseOver={() => setHover(true)}
         onMouseOut={() => setHover(false)}
       />
     </button>
-  );
+  )
 }
