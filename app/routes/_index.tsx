@@ -16,6 +16,8 @@ import siwe from "siwe";
 
 import { Card } from "~/components/Card";
 import { hooks, metaMask } from "~/lib/connectors/metaMask";
+import { HoverButton } from "~/components/HoverButton";
+import { ConnectWithSelect } from "~/components/ConnectWithSelect";
 
 const {
   useChainId,
@@ -164,11 +166,43 @@ export default function Index() {
 
   return (
     <div
-      className="bg-cover bg-center h-screen"
+      className="bg-repeat h-full min-h-screen"
       style={{ backgroundImage: `url(${imageUrl})` }}
     >
-      <div className="max-w-screen-2xl mx-auto pt-36 border border-yellow-100">
-        <Card
+      <div className="max-w-screen-2xl mx-auto border border-yellow-100 h-screen flex flex-col items-center justify-center px-8 lg:px-0">
+        <div className="flex flex-col items-center justify-center">
+          <div>
+            <img
+              src="https://pixelady.s3.amazonaws.com/aura-petz/website_logo.webp"
+              width="1037"
+              height="172"
+              alt="milady aura petz"
+            />
+          </div>
+          <div>
+            <img
+              src="https://pixelady.s3.amazonaws.com/aura-petz/bunny.webp"
+              width="352"
+              height="436"
+              alt="bunny pet"
+            />
+          </div>
+
+          <div className="">
+            <ConnectWithSelect
+              connector={metaMask}
+              activeChainId={chainId}
+              chainIds={[1, 11155111]}
+              isActivating={isActivating}
+              isActive={isActive}
+              error={error}
+              setError={setError}
+            />
+
+            {/* <HoverButton /> */}
+          </div>
+        </div>
+        {/* <Card
           connector={metaMask}
           activeChainId={chainId}
           isActivating={isActivating}
@@ -179,7 +213,7 @@ export default function Index() {
           accounts={accounts}
           provider={provider}
           ENSNames={ENSNames}
-        />
+        /> */}
       </div>
     </div>
   );

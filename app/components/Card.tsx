@@ -38,7 +38,7 @@ export function Card({
   provider,
 }: Props) {
   return (
-    <div className="flex flex-col justify-between w-80 p-4 m-4 overflow-auto border border-solid rounded-lg text-white">
+    <div className="flex flex-col justify-between w-80 p-4 m-4 border border-solid rounded-lg text-white">
       <b>{getName(connector)}</b>
       <div style={{ marginBottom: "1rem" }}>
         <Status isActivating={isActivating} isActive={isActive} error={error} />

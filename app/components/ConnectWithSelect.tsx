@@ -4,8 +4,9 @@ import { Network } from "@web3-react/network";
 import { useCallback, useEffect, useState } from "react";
 
 import { CHAINS, getAddChainParameters } from "~/lib/chains";
+import { HoverButton } from "./HoverButton";
 
-function ChainSelect({
+export function ChainSelect({
   activeChainId,
   switchChain,
   chainIds,
@@ -109,41 +110,41 @@ export function ConnectWithSelect({
     [connector, activeChainId, setError]
   );
 
+  const _disconnect = error ? (
+    <button onClick={() => switchChain(desiredChainId)}>Try again?</button>
+  ) : (
+    <button
+      onClick={() => {
+        if (connector?.deactivate) {
+          void connector.deactivate();
+        } else {
+          void connector.resetState();
+        }
+        // setDesiredChainId(1);
+      }}
+    >
+      Disconnect
+    </button>
+  );
+
   return (
-    <div className="flex flex-col">
-      <ChainSelect
+    <div className="flex flex-col text-white">
+      {/* <ChainSelect
         activeChainId={desiredChainId}
         switchChain={switchChain}
         chainIds={chainIds}
-      />
+      /> */}
       <div style={{ marginBottom: "1rem" }} />
-      {isActive ? (
-        error ? (
-          <button onClick={() => switchChain(desiredChainId)}>
-            Try again?
-          </button>
-        ) : (
-          <button
-            onClick={() => {
-              if (connector?.deactivate) {
-                void connector.deactivate();
-              } else {
-                void connector.resetState();
-              }
-              // setDesiredChainId(1);
-            }}
-          >
-            Disconnect
-          </button>
-        )
-      ) : (
-        <button
+      {isActive ? null : (
+        <HoverButton
           onClick={() => switchChain(desiredChainId)}
           disabled={isActivating || !desiredChainId}
-        >
-          {error ? "Try again?" : "Connect"}" "{isActivating.toString()}{" "}
-          {desiredChainId}
-        </button>
+        />
+        // <button
+        // >
+        //   {error ? "Try again?" : "Connect"}" "{isActivating.toString()}{" "}
+        //   {desiredChainId}
+        // </button>
       )}
     </div>
   );
